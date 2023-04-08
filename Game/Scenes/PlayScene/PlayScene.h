@@ -9,12 +9,19 @@
 
 #include "../Scene/Scene.h"
 
+//　ポジション型の宣言
+typedef struct { int x, y; }Position;
+
 class PlayScene : public Scene
 {
 private:
-	typedef struct { int x, y; }Position;
+	//　マウスの位置
 	Position m_Mouse;
+
+	//　CSVに書き出す数値
 	int m_BlockNum;
+
+	//　セーブ用変数
 	int m_SaveCount;
 	bool is_SaveFlag;
 

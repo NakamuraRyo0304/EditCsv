@@ -57,24 +57,6 @@ void PlayScene::Init(int screenWidth, int screenHeight)
 //--------------------------------------------------------//
 void PlayScene::Update(float deltaTime)
 {
-	//　セーブ中は半透明化
-	if (is_SaveFlag)
-	{
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 120);
-		if (!(m_SaveCount > 600 && m_SaveCount <= 651))
-		{
-			is_SaveFlag = false;
-		}
-	}
-	else
-	{
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
-		if (m_SaveCount > 600 && m_SaveCount <= 651)
-		{
-			is_SaveFlag = true;
-		}
-	}
-
 	//　オートセーブ
 	AutoSave();
 
@@ -190,6 +172,24 @@ void PlayScene::Finalize()
 //--------------------------------------------------------//
 void PlayScene::AutoSave()
 {
+	//　セーブ中は半透明化
+	if (is_SaveFlag)
+	{
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 120);
+		if (!(m_SaveCount > 600 && m_SaveCount <= 651))
+		{
+			is_SaveFlag = false;
+		}
+	}
+	else
+	{
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+		if (m_SaveCount > 600 && m_SaveCount <= 651)
+		{
+			is_SaveFlag = true;
+		}
+	}
+
 	//　保存までカウントダウン
 	m_SaveCount++;
 	if (m_SaveCount > 660)//　1秒だけ確認用に猶予あり
