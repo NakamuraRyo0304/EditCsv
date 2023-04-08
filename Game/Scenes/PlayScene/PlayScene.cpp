@@ -12,6 +12,11 @@
 #define		SCREEN_HEIGHT		800
 #define		BLOCK_SPAWN			20
 
+//　秒数
+#define		SECOND				60
+//　60フレーム(1秒) ×　秒数(SECOND)
+#define		SAVE_SPAWN			60 * SECOND
+
 //　ブロック配列
 int m_MapBlock[SCREEN_WIDTH / BLOCK_SPAWN][SCREEN_HEIGHT / BLOCK_SPAWN];
 int m_SaveBlock[SCREEN_WIDTH / BLOCK_SPAWN][SCREEN_HEIGHT / BLOCK_SPAWN];
@@ -145,15 +150,15 @@ void PlayScene::Draw()
 	DrawFormatString(0, 60, Black, "Num = (%d)", m_BlockNum);
 
 	//　セーブ確認
-	if (m_SaveCount > 650)
+	if (m_SaveCount > SAVE_SPAWN + 60)
 	{
 		DrawFormatString(0, 120, Black, "セーブ中...");
 	}
-	else if (m_SaveCount > 625)
+	else if (m_SaveCount > SAVE_SPAWN + 30)
 	{
 		DrawFormatString(0, 120, Black, "セーブ中..");
 	}
-	else if (m_SaveCount > 600)
+	else if (m_SaveCount > SAVE_SPAWN)
 	{
 		DrawFormatString(0, 120, Black, "セーブ中.");
 	}
@@ -176,7 +181,7 @@ void PlayScene::AutoSave()
 	if (is_SaveFlag)
 	{
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 120);
-		if (!(m_SaveCount > 600 && m_SaveCount <= 651))
+		if (!(m_SaveCount > SAVE_SPAWN && m_SaveCount <= SAVE_SPAWN + 1))
 		{
 			is_SaveFlag = false;
 		}
@@ -184,7 +189,7 @@ void PlayScene::AutoSave()
 	else
 	{
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
-		if (m_SaveCount > 600 && m_SaveCount <= 651)
+		if (m_SaveCount > SAVE_SPAWN && m_SaveCount <= SAVE_SPAWN + 1)
 		{
 			is_SaveFlag = true;
 		}
@@ -192,13 +197,13 @@ void PlayScene::AutoSave()
 
 	//　保存までカウントダウン
 	m_SaveCount++;
-	if (m_SaveCount > 660)//　1秒だけ確認用に猶予あり
+	if (m_SaveCount > SAVE_SPAWN + 60)//　1秒だけ確認用に猶予あり
 	{
 		m_SaveCount = 0;
 	}
 
 	//　配列を保存する
-	if (m_SaveCount == 600)
+	if (m_SaveCount == SAVE_SPAWN)
 	{
 		for (int y = 0; y < SCREEN_HEIGHT / BLOCK_SPAWN; y++)
 		{
