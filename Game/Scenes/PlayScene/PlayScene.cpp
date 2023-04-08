@@ -8,16 +8,23 @@
 #include <DxLib.h>
 #include "PlayScene.h"
 
+//　スクリーンサイズ
 #define		SCREEN_WIDTH		1000
 #define		SCREEN_HEIGHT		800
-#define		BLOCK_SPAWN			20
-#define		BUG_BLOCK			10
 
 //　秒数
 #define		SECOND				60
+//　フレーム数
+#define		FRAME				60
 //　60フレーム(1秒) ×　秒数(SECOND)
-#define		SAVE_SPAWN			60 * SECOND
+#define		SAVE_SPAWN			FRAME * SECOND
 
+//　ナンバーの最大値
+#define		MAX_NUMBER			10
+
+//　ブロック
+#define		BLOCK_SPAWN			20
+#define		BUG_BLOCK			10
 //　ブロック配列
 int m_MapBlock[SCREEN_WIDTH / BLOCK_SPAWN + BUG_BLOCK][SCREEN_HEIGHT / BLOCK_SPAWN + BUG_BLOCK];
 int m_SaveBlock[SCREEN_WIDTH / BLOCK_SPAWN + BUG_BLOCK][SCREEN_HEIGHT / BLOCK_SPAWN + BUG_BLOCK];
@@ -68,8 +75,9 @@ void PlayScene::Update(float deltaTime)
 
 	//　マウスの座標取得
 	GetMousePoint(&m_Mouse.x, &m_Mouse.y);
-	m_Mouse.x = Func::Clamp(m_Mouse.x, 0, SCREEN_WIDTH);
-	m_Mouse.y = Func::Clamp(m_Mouse.y, 0, SCREEN_HEIGHT);
+	
+	m_Mouse.x = Func::Clamp(m_Mouse.x, 0, SCREEN_WIDTH - BLOCK_SPAWN / 2);
+	m_Mouse.y = Func::Clamp(m_Mouse.y, 0, SCREEN_HEIGHT - BLOCK_SPAWN / 2);
 
 	//　右クリック描画
 	if (GetMouseInput() & MOUSE_INPUT_LEFT)
@@ -79,7 +87,7 @@ void PlayScene::Update(float deltaTime)
 
 	//　ホイール回転で数値変更
 	m_BlockNum += GetMouseWheelRotVol();
-	m_BlockNum = Func::Clamp(m_BlockNum, 0, 5);
+	m_BlockNum = Func::Clamp(m_BlockNum, 0, MAX_NUMBER);
 
 	//　編集が終わったらエンターで終了
 	if (pGameSystem->GetInputSystem().IsKeyPressed(KEY_INPUT_RETURN))
@@ -131,6 +139,31 @@ void PlayScene::Draw()
 					x * BLOCK_SPAWN + BLOCK_SPAWN, y * BLOCK_SPAWN + BLOCK_SPAWN,
 					Red, TRUE);
 				break;
+			case 6:
+				DrawBox(x * BLOCK_SPAWN, y * BLOCK_SPAWN,
+					x * BLOCK_SPAWN + BLOCK_SPAWN, y * BLOCK_SPAWN + BLOCK_SPAWN,
+					Purple, TRUE);
+				break;
+			case 7:
+				DrawBox(x * BLOCK_SPAWN, y * BLOCK_SPAWN,
+					x * BLOCK_SPAWN + BLOCK_SPAWN, y * BLOCK_SPAWN + BLOCK_SPAWN,
+					Orange, TRUE);
+				break;
+			case 8:
+				DrawBox(x * BLOCK_SPAWN, y * BLOCK_SPAWN,
+					x * BLOCK_SPAWN + BLOCK_SPAWN, y * BLOCK_SPAWN + BLOCK_SPAWN,
+					DeepPink, TRUE);
+				break;
+			case 9:
+				DrawBox(x * BLOCK_SPAWN, y * BLOCK_SPAWN,
+					x * BLOCK_SPAWN + BLOCK_SPAWN, y * BLOCK_SPAWN + BLOCK_SPAWN,
+					Aqua, TRUE);
+				break;
+			case 10:
+				DrawBox(x * BLOCK_SPAWN, y * BLOCK_SPAWN,
+					x * BLOCK_SPAWN + BLOCK_SPAWN, y * BLOCK_SPAWN + BLOCK_SPAWN,
+					Brown, TRUE);
+				break;
 			}
 
 			//　ボックスの枠
@@ -139,6 +172,11 @@ void PlayScene::Draw()
 				Gray, FALSE);
 		}
 	}
+
+	//　マウスの位置
+	DrawBox(m_Mouse.x - BLOCK_SPAWN / 2, m_Mouse.y - BLOCK_SPAWN / 2,
+		m_Mouse.x + BLOCK_SPAWN / 2, m_Mouse.y + BLOCK_SPAWN / 2,
+		Red, true);
 
 	//　デバッグ文字情報
 	DebugText();
@@ -157,11 +195,6 @@ void PlayScene::Finalize()
 //--------------------------------------------------------//
 void PlayScene::DebugText()
 {
-	//　マウスの位置
-	DrawBox(m_Mouse.x - BLOCK_SPAWN / 2, m_Mouse.y - BLOCK_SPAWN / 2,
-		m_Mouse.x + BLOCK_SPAWN / 2, m_Mouse.y + BLOCK_SPAWN / 2,
-		Red, true);
-
 	//　スクリーン座標
 	DrawFormatString(20, 30, Black, "(x,y) = (%d,%d)", m_Mouse.x, m_Mouse.y);
 	//　ブロック番号（マウスホイール回転量）
@@ -173,15 +206,15 @@ void PlayScene::DebugText()
 	}
 
 	//　セーブ確認
-	if (m_SaveCount > SAVE_SPAWN + 120)
+	if		(m_SaveCount > SAVE_SPAWN + (2 * FRAME))
 	{
 		DrawFormatString(20, 120, Black, "セーブ中...");
 	}
-	else if (m_SaveCount > SAVE_SPAWN + 60)
+	else if (m_SaveCount > SAVE_SPAWN + (1 * FRAME))
 	{
 		DrawFormatString(20, 120, Black, "セーブ中..");
 	}
-	else if (m_SaveCount > SAVE_SPAWN)
+	else if (m_SaveCount > SAVE_SPAWN + (0 * FRAME))
 	{
 		DrawFormatString(20, 120, Black, "セーブ中.");
 	}

@@ -29,5 +29,9 @@ namespace Color
 	//　橙
 #define			Orange		0xffa500
 	//　桃
-#define			Pink		0xffc0cb
+#define			DeepPink	0xFF1493
+	//　水
+#define			Aqua		0x00FFFF
+	//　茶
+#define			Brown		0xA52A2A
 }
