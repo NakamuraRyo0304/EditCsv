@@ -46,6 +46,9 @@ public:
 		return is_ChangeSceneFlag;
 	};
 
+	//　デバッグ文字
+	void DebugText();
+
 	//　オートセーブ
 	void AutoSave();
 

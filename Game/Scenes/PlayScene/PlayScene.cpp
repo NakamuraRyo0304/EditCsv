@@ -11,6 +11,7 @@
 #define		SCREEN_WIDTH		1000
 #define		SCREEN_HEIGHT		800
 #define		BLOCK_SPAWN			20
+#define		BUG_BLOCK			10
 
 //　秒数
 #define		SECOND				60
@@ -18,8 +19,8 @@
 #define		SAVE_SPAWN			60 * SECOND
 
 //　ブロック配列
-int m_MapBlock[SCREEN_WIDTH / BLOCK_SPAWN][SCREEN_HEIGHT / BLOCK_SPAWN];
-int m_SaveBlock[SCREEN_WIDTH / BLOCK_SPAWN][SCREEN_HEIGHT / BLOCK_SPAWN];
+int m_MapBlock[SCREEN_WIDTH / BLOCK_SPAWN + BUG_BLOCK][SCREEN_HEIGHT / BLOCK_SPAWN + BUG_BLOCK];
+int m_SaveBlock[SCREEN_WIDTH / BLOCK_SPAWN + BUG_BLOCK][SCREEN_HEIGHT / BLOCK_SPAWN + BUG_BLOCK];
 
 
  //--------------------------------------------------------//
@@ -98,9 +99,9 @@ void PlayScene::Draw()
 	DrawBoxAA(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, White, true);
 
 	// ブロック
-	for (int y = 0; y < (SCREEN_HEIGHT / BLOCK_SPAWN) + 10; y++)
+	for (int y = 0; y < (SCREEN_HEIGHT / BLOCK_SPAWN) + BUG_BLOCK; y++)
 	{
-		for (int x = 0; x < SCREEN_WIDTH / BLOCK_SPAWN; x++)
+		for (int x = 0; x < (SCREEN_WIDTH / BLOCK_SPAWN) + BUG_BLOCK; x++)
 		{
 			//　数値ありブロック
 			switch (m_MapBlock[x][y])
@@ -135,33 +136,12 @@ void PlayScene::Draw()
 			//　ボックスの枠
 			DrawBox(x * BLOCK_SPAWN, y * BLOCK_SPAWN,
 				x * BLOCK_SPAWN + BLOCK_SPAWN, y * BLOCK_SPAWN + BLOCK_SPAWN,
-				Black, FALSE);
+				Gray, FALSE);
 		}
 	}
 
-	//　マウスの位置
-	DrawBox(m_Mouse.x - BLOCK_SPAWN / 2, m_Mouse.y - BLOCK_SPAWN / 2,
-		    m_Mouse.x + BLOCK_SPAWN / 2, m_Mouse.y + BLOCK_SPAWN / 2,
-		    Red, true);
-	
-	//　スクリーン座標
-	DrawFormatString(0, 30, Black, "(x,y) = (%d,%d)", m_Mouse.x, m_Mouse.y);
-	//　ブロック番号（マウスホイール回転量）
-	DrawFormatString(0, 60, Black, "Num = (%d)", m_BlockNum);
-
-	//　セーブ確認
-	if (m_SaveCount > SAVE_SPAWN + 60)
-	{
-		DrawFormatString(0, 120, Black, "セーブ中...");
-	}
-	else if (m_SaveCount > SAVE_SPAWN + 30)
-	{
-		DrawFormatString(0, 120, Black, "セーブ中..");
-	}
-	else if (m_SaveCount > SAVE_SPAWN)
-	{
-		DrawFormatString(0, 120, Black, "セーブ中.");
-	}
+	//　デバッグ文字情報
+	DebugText();
 }
 
 //--------------------------------------------------------//
@@ -170,6 +150,41 @@ void PlayScene::Draw()
 void PlayScene::Finalize()
 {
 
+}
+
+//--------------------------------------------------------//
+//デバッグ用文字                                          //
+//--------------------------------------------------------//
+void PlayScene::DebugText()
+{
+	//　マウスの位置
+	DrawBox(m_Mouse.x - BLOCK_SPAWN / 2, m_Mouse.y - BLOCK_SPAWN / 2,
+		m_Mouse.x + BLOCK_SPAWN / 2, m_Mouse.y + BLOCK_SPAWN / 2,
+		Red, true);
+
+	//　スクリーン座標
+	DrawFormatString(20, 30, Black, "(x,y) = (%d,%d)", m_Mouse.x, m_Mouse.y);
+	//　ブロック番号（マウスホイール回転量）
+	DrawFormatString(20, 60, Black, "Num = (%d)", m_BlockNum);
+	//　セーブまでのカウント
+	if ((SAVE_SPAWN - m_SaveCount) / SECOND > 0)
+	{
+		DrawFormatString(20, 90, Black, "セーブまで:%d", (SAVE_SPAWN - m_SaveCount) / SECOND);
+	}
+
+	//　セーブ確認
+	if (m_SaveCount > SAVE_SPAWN + 120)
+	{
+		DrawFormatString(20, 120, Black, "セーブ中...");
+	}
+	else if (m_SaveCount > SAVE_SPAWN + 60)
+	{
+		DrawFormatString(20, 120, Black, "セーブ中..");
+	}
+	else if (m_SaveCount > SAVE_SPAWN)
+	{
+		DrawFormatString(20, 120, Black, "セーブ中.");
+	}
 }
 
 //--------------------------------------------------------//
@@ -197,7 +212,7 @@ void PlayScene::AutoSave()
 
 	//　保存までカウントダウン
 	m_SaveCount++;
-	if (m_SaveCount > SAVE_SPAWN + 60)//　1秒だけ確認用に猶予あり
+	if (m_SaveCount > SAVE_SPAWN + 180)
 	{
 		m_SaveCount = 0;
 	}
