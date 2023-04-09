@@ -152,8 +152,8 @@ void PlayScene::Draw()
 					Green, TRUE);
 				break;
 			case 4:
-				DrawBox(x * BLOCK_SPAWN + m_Move.x, y * BLOCK_SPAWN + m_Move.y,
-					x * BLOCK_SPAWN + BLOCK_SPAWN + m_Move.x, y * BLOCK_SPAWN + BLOCK_SPAWN + m_Move.y,
+				DrawBox(x * BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN - m_Move.y,
+					x * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.y,
 					Black, TRUE);	
 				break;
 			case 5:
@@ -435,6 +435,9 @@ void PlayScene::ExportCSV()
 
 	//　ファイルを閉じる
 	ofs.close();
+
+	//　マウスカーソルの非表示
+	SetMouseDispFlag(false);
 }
 
 //--------------------------------------------------------//
