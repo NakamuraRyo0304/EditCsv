@@ -87,17 +87,18 @@ void PlayScene::Update(float deltaTime)
 	//　マウスの座標取得
 	GetMousePoint(&m_Mouse.x, &m_Mouse.y);
 	
-	m_Mouse.x = Func::Clamp(m_Mouse.x, 0, SCREEN_WIDTH - BLOCK_SPAWN / 2);
-	m_Mouse.y = Func::Clamp(m_Mouse.y, 0, SCREEN_HEIGHT - BLOCK_SPAWN / 2);
-
-	//　マスの移動
-	BlockMove();
-
 	//　右クリック描画
 	if (GetMouseInput() & MOUSE_INPUT_LEFT)
 	{
+		//　配列範囲外にアクセスしない
+		if (m_Mouse.x < 0 || m_Mouse.y < 0) return;
+
 		m_MapBlock[(m_Mouse.y + m_Move.y) / BLOCK_SPAWN][(m_Mouse.x + m_Move.x) / BLOCK_SPAWN] = m_BlockNum;
 	}
+
+	//　範囲外に行かないようにする
+	m_Mouse.x = Func::Clamp(m_Mouse.x, 0, SCREEN_WIDTH - BLOCK_SPAWN / 2);
+	m_Mouse.y = Func::Clamp(m_Mouse.y, 0, SCREEN_HEIGHT - BLOCK_SPAWN / 2);
 
 	//　ホイール回転で数値変更
 	m_BlockNum += GetMouseWheelRotVol();
@@ -115,6 +116,9 @@ void PlayScene::Update(float deltaTime)
 	{
 		ExitApp();
 	}
+
+	//　マスの移動
+	BlockMove();
 }
 
 //--------------------------------------------------------//
@@ -314,20 +318,20 @@ void PlayScene::BlockMove()
 		if (m_StartPos.x > m_Mouse.x)
 		{
 			if (m_Move.x < 0)return;
-			m_Move.x-=5;
+			m_Move.x -= 5;
 		}
 		if (m_StartPos.x < m_Mouse.x)
 		{
-			m_Move.x+=5;
+			m_Move.x += 5;
 		}
 		if (m_StartPos.y > m_Mouse.y)
 		{
 			if (m_Move.y < 0)return;
-			m_Move.y-=5;
+			m_Move.y -= 5;
 		}
 		if (m_StartPos.y < m_Mouse.y)
 		{
-			m_Move.y+=5;
+			m_Move.y += 5;
 		}
 	}
 
