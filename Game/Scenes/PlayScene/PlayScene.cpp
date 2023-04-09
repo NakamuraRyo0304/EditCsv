@@ -421,15 +421,15 @@ void PlayScene::ExportCSV()
 
 	using namespace std;
 
-	OPENFILENAME ofn;						//FILENAME構造体の定義
-	char path[MAX_PATH] = "";				//ファイルパスを初期化
-	ZeroMemory(&ofn, sizeof(ofn));			//構造体のパスを空にする
-	ofn.lStructSize = sizeof(OPENFILENAME); //構造体のサイズを指定
-	ofn.lpstrFilter = "csv(*.csv)\0*.csv\0" //拡張子のフィルターをかける
-		"すべてのファイル(*.*)\0*.*\0\0";	
-	ofn.lpstrFile = path;					//ファイルパスを格納するポインタ
-	ofn.nMaxFile = MAX_PATH;				//lpstrFileのバッファサイズ
-	ofn.lpstrDefExt = ".csv";				//拡張子が指定されていなければ".csv"をつける
+	OPENFILENAME ofn;							//　FILENAME構造体の定義
+	char path[MAX_PATH] = "";					//　ファイルパスを初期化
+	ZeroMemory(&ofn, sizeof(ofn));				//　構造体のパスを空にする
+	ofn.lStructSize = sizeof(OPENFILENAME);		//　構造体のサイズを指定
+	ofn.lpstrFilter = "csv(*.csv)\0*.csv\0"		//　拡張子のフィルターをかける \nは文の終わりを表す
+		"すべてのファイル(*.*)\0*.*\0\0";		
+	ofn.lpstrFile = path;						//　ファイルパスを格納するポインタ
+	ofn.nMaxFile = MAX_PATH;					//　lpstrFileのバッファサイズ
+	ofn.lpstrDefExt = ".csv";					//　拡張子が指定されていなければ".csv"をつける
 	int result = 0;
 
 	GetSaveFileName(&ofn);
