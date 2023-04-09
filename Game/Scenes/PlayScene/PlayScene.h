@@ -8,6 +8,7 @@
 #pragma once
 
 #include "../Scene/Scene.h"
+#include <vector>
 
 //　ポジション型の宣言
 typedef struct { int x, y; }Position;
@@ -17,6 +18,8 @@ class PlayScene : public Scene
 private:
 	//　マウスの位置
 	Position m_Mouse;
+	Position m_Move;
+	Position m_StartPos;
 
 	//　CSVに書き出す数値
 	int m_BlockNum;
@@ -27,6 +30,10 @@ private:
 
 	//　現在の色
 	unsigned int m_NowColor;
+
+	//　ブロック配列
+	std::vector<std::vector<int>> m_MapBlock;
+	std::vector<std::vector<int>> m_SaveBlock;
 
 public:
 	PlayScene();
@@ -51,6 +58,12 @@ public:
 
 	//　デバッグ文字
 	void DebugText();
+
+	//　ブロック色変更
+	void ChangeBlockColor();
+
+	//　マスを移動させる
+	void BlockMove();
 
 	//　オートセーブ
 	void AutoSave();
