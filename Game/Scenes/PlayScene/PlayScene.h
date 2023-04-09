@@ -25,6 +25,9 @@ private:
 	int m_SaveCount;
 	bool is_SaveFlag;
 
+	//@Œ»İ‚ÌF
+	unsigned int m_NowColor;
+
 public:
 	PlayScene();
 	~PlayScene();

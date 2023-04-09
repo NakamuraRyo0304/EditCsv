@@ -38,7 +38,8 @@ PlayScene::PlayScene() :
 	m_Mouse(),
 	m_BlockNum(),
 	m_SaveCount(),
-	is_SaveFlag()
+	is_SaveFlag(),
+	m_NowColor()
 {
 	//　マウスカーソルを隠す
 	SetMouseDispFlag(false);
@@ -97,6 +98,43 @@ void PlayScene::Update(float deltaTime)
 		//　ソフト終了
 		ExitApp();
 	}
+
+	switch (m_BlockNum)
+	{
+	case 1:
+		m_NowColor = Blue;
+		break;
+	case 2:
+		m_NowColor = Yellow;
+		break;
+	case 3:
+		m_NowColor = Green;
+		break;
+	case 4:
+		m_NowColor = Black;
+		break;
+	case 5:
+		m_NowColor = Red;
+		break;
+	case 6:
+		m_NowColor = Purple;
+		break;
+	case 7:
+		m_NowColor = Orange;
+		break;
+	case 8:
+		m_NowColor = DeepPink;
+		break;
+	case 9:
+		m_NowColor = Aqua;
+		break;
+	case 10:
+		m_NowColor = Brown;
+		break;
+	default:
+		m_NowColor = White;
+		break;
+	}
 }
 
 //--------------------------------------------------------//
@@ -132,7 +170,7 @@ void PlayScene::Draw()
 			case 4:
 				DrawBox(x * BLOCK_SPAWN, y * BLOCK_SPAWN,
 					x * BLOCK_SPAWN + BLOCK_SPAWN, y * BLOCK_SPAWN + BLOCK_SPAWN,
-					Black, TRUE);
+					Black, TRUE);	
 				break;
 			case 5:
 				DrawBox(x * BLOCK_SPAWN, y * BLOCK_SPAWN,
@@ -174,9 +212,12 @@ void PlayScene::Draw()
 	}
 
 	//　マウスの位置
+	DrawBox(m_Mouse.x - BLOCK_SPAWN / 2 - 1, m_Mouse.y - BLOCK_SPAWN / 2 - 1,
+		m_Mouse.x + BLOCK_SPAWN / 2 + 1, m_Mouse.y + BLOCK_SPAWN / 2 + 1,
+		Black, true);
 	DrawBox(m_Mouse.x - BLOCK_SPAWN / 2, m_Mouse.y - BLOCK_SPAWN / 2,
 		m_Mouse.x + BLOCK_SPAWN / 2, m_Mouse.y + BLOCK_SPAWN / 2,
-		Red, true);
+		m_NowColor, true);
 
 	//　デバッグ文字情報
 	DebugText();
