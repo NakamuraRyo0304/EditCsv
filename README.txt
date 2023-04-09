@@ -1,13 +1,10 @@
-CSVエディタ　作成者：中村凌
+Author			中村凌
+Date			2023/04/10
 
-・マウスホイールで値変更
-
-　現在０～５
-
-・描きたい位置にマウスカーソルを合わせて左クリック
-
-・Zキーを押すと過去のセーブまで戻る
-
-　一度戻ったら取り消せない＆10秒間隔でセーブされている
-
-・完了したらエンターで書き出し
+MouseCursor　　　	カーソル移動
+MouseLeftClick 　	描画＆消去
+MouseMiddleClick 	マス移動
+MouseWheel	 	色変更（０が消しゴム）0-10まで対応
+MouseWheel＆Shift	拡大縮小
+Enter(Return)	 	保存
+Esc			終了
