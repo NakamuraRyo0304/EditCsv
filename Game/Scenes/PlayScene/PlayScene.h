@@ -34,6 +34,8 @@ private:
 	//　ブロック配列
 	std::vector<std::vector<int>> m_MapBlock;
 	std::vector<std::vector<int>> m_SaveBlock;
+	//　ブロックの大きさ
+	int m_BlockSize;
 
 public:
 	PlayScene();

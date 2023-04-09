@@ -23,7 +23,7 @@
 #define		MAX_NUMBER			10
 
 //　ブロック
-#define		BLOCK_SPAWN			20
+#define		BLOCK_DEFAULT		20
 //　ブロック数
 typedef struct { int x, y; }STAGESIZE;
 STAGESIZE STAGE_SIZE = { 500,400 };
@@ -39,10 +39,12 @@ PlayScene::PlayScene() :
 	is_SaveFlag(),
 	m_NowColor(),
 	m_Move(),
-	m_StartPos()
+	m_StartPos(),
+	m_BlockSize()
 {
 	//　マウスカーソルを隠す
 	SetMouseDispFlag(false);
+	m_BlockSize = BLOCK_DEFAULT;
 }
 
 //--------------------------------------------------------//
@@ -66,6 +68,7 @@ void PlayScene::Init(int screenWidth, int screenHeight)
 	m_StartPos = { 0 };
 	m_BlockNum = 0;
 	m_SaveCount = 0;
+	m_BlockSize = BLOCK_DEFAULT;
 
 	//　可変長配列の初期化
 	std::vector<int>tmp((int)STAGE_SIZE.x, 0);
@@ -93,16 +96,26 @@ void PlayScene::Update(float deltaTime)
 		//　配列範囲外にアクセスしない
 		if (m_Mouse.x < 0 || m_Mouse.y < 0) return;
 
-		m_MapBlock[(m_Mouse.y + m_Move.y) / BLOCK_SPAWN][(m_Mouse.x + m_Move.x) / BLOCK_SPAWN] = m_BlockNum;
+		m_MapBlock[(m_Mouse.y + m_Move.y) / m_BlockSize][(m_Mouse.x + m_Move.x) / m_BlockSize] = m_BlockNum;
 	}
 
 	//　範囲外に行かないようにする
-	m_Mouse.x = Func::Clamp(m_Mouse.x, 0, SCREEN_WIDTH - BLOCK_SPAWN / 2);
-	m_Mouse.y = Func::Clamp(m_Mouse.y, 0, SCREEN_HEIGHT - BLOCK_SPAWN / 2);
+	m_Mouse.x = Func::Clamp(m_Mouse.x, 0, SCREEN_WIDTH - m_BlockSize / 2);
+	m_Mouse.y = Func::Clamp(m_Mouse.y, 0, SCREEN_HEIGHT - m_BlockSize / 2);
 
-	//　ホイール回転で数値変更
-	m_BlockNum += GetMouseWheelRotVol();
-	m_BlockNum = Func::Clamp(m_BlockNum, 0, MAX_NUMBER);
+	//　ホイールとSHIFTでマスを大きくする
+	if (pGameSystem->GetInputSystem().IsKeyDown(KEY_INPUT_LSHIFT))
+	{
+		//　ホイール回転で拡大縮小
+		m_BlockSize += GetMouseWheelRotVol();
+		m_BlockSize = Func::Clamp(m_BlockSize, BLOCK_DEFAULT, BLOCK_DEFAULT * 10);
+	}
+	else
+	{
+		//　ホイール回転で数値変更
+		m_BlockNum += GetMouseWheelRotVol();
+		m_BlockNum = Func::Clamp(m_BlockNum, 0, MAX_NUMBER);
+	}
 
 	//　編集が終わったらエンターで終了
 	if (pGameSystem->GetInputSystem().IsKeyPressed(KEY_INPUT_RETURN))
@@ -137,70 +150,70 @@ void PlayScene::Draw()
 			switch (m_MapBlock[y][x])
 			{
 			case 1:
-				DrawBox(x * BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN - m_Move.y,
-					x * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.y,
+				DrawBox(x * m_BlockSize - m_Move.x, y * m_BlockSize - m_Move.y,
+					x * m_BlockSize + m_BlockSize - m_Move.x, y * m_BlockSize + m_BlockSize - m_Move.y,
 					Blue, TRUE);
 				break;
 			case 2:
-				DrawBox(x * BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN - m_Move.y,
-					x * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.y,
+				DrawBox(x * m_BlockSize - m_Move.x, y * m_BlockSize - m_Move.y,
+					x * m_BlockSize + m_BlockSize - m_Move.x, y * m_BlockSize + m_BlockSize - m_Move.y,
 					Yellow, TRUE);
 				break;
 			case 3:
-				DrawBox(x * BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN - m_Move.y,
-					x * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.y,
+				DrawBox(x * m_BlockSize - m_Move.x, y * m_BlockSize - m_Move.y,
+					x * m_BlockSize + m_BlockSize - m_Move.x, y * m_BlockSize + m_BlockSize - m_Move.y,
 					Green, TRUE);
 				break;
 			case 4:
-				DrawBox(x * BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN - m_Move.y,
-					x * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.y,
+				DrawBox(x * m_BlockSize - m_Move.x, y * m_BlockSize - m_Move.y,
+					x * m_BlockSize + m_BlockSize - m_Move.x, y * m_BlockSize + m_BlockSize - m_Move.y,
 					Black, TRUE);	
 				break;
 			case 5:
-				DrawBox(x * BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN - m_Move.y,
-					x * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.y,
+				DrawBox(x * m_BlockSize - m_Move.x, y * m_BlockSize - m_Move.y,
+					x * m_BlockSize + m_BlockSize - m_Move.x, y * m_BlockSize + m_BlockSize - m_Move.y,
 					Red, TRUE);
 				break;
 			case 6:
-				DrawBox(x * BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN - m_Move.y,
-					x * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.y,
+				DrawBox(x * m_BlockSize - m_Move.x, y * m_BlockSize - m_Move.y,
+					x * m_BlockSize + m_BlockSize - m_Move.x, y * m_BlockSize + m_BlockSize - m_Move.y,
 					Purple, TRUE);
 				break;
 			case 7:
-				DrawBox(x * BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN - m_Move.y,
-					x * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.y,
+				DrawBox(x * m_BlockSize - m_Move.x, y * m_BlockSize - m_Move.y,
+					x * m_BlockSize + m_BlockSize - m_Move.x, y * m_BlockSize + m_BlockSize - m_Move.y,
 					Orange, TRUE);
 				break;
 			case 8:
-				DrawBox(x * BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN - m_Move.y,
-					x * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.y,
+				DrawBox(x * m_BlockSize - m_Move.x, y * m_BlockSize - m_Move.y,
+					x * m_BlockSize + m_BlockSize - m_Move.x, y * m_BlockSize + m_BlockSize - m_Move.y,
 					DeepPink, TRUE);
 				break;
 			case 9:
-				DrawBox(x * BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN - m_Move.y,
-					x * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.y,
+				DrawBox(x * m_BlockSize - m_Move.x, y * m_BlockSize - m_Move.y,
+					x * m_BlockSize + m_BlockSize - m_Move.x, y * m_BlockSize + m_BlockSize - m_Move.y,
 					Aqua, TRUE);
 				break;
 			case 10:
-				DrawBox(x * BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN - m_Move.y,
-					x * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.y,
+				DrawBox(x * m_BlockSize - m_Move.x, y * m_BlockSize - m_Move.y,
+					x * m_BlockSize + m_BlockSize - m_Move.x, y * m_BlockSize + m_BlockSize - m_Move.y,
 					Brown, TRUE);
 				break;
 			}
 
 			//　ボックスの枠
-			DrawBox(x * BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN - m_Move.y,
-				x * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.x, y * BLOCK_SPAWN + BLOCK_SPAWN - m_Move.y,
+			DrawBox(x * m_BlockSize - m_Move.x, y * m_BlockSize - m_Move.y,
+				x * m_BlockSize + m_BlockSize - m_Move.x, y * m_BlockSize + m_BlockSize - m_Move.y,
 				Gray, FALSE);
 		}
 	}
 
 	//　マウスの位置
-	DrawBox(m_Mouse.x - BLOCK_SPAWN / 2 - 1, m_Mouse.y - BLOCK_SPAWN / 2 - 1,
-		m_Mouse.x + BLOCK_SPAWN / 2 + 1, m_Mouse.y + BLOCK_SPAWN / 2 + 1,
+	DrawBox(m_Mouse.x - m_BlockSize / 2 - 1, m_Mouse.y - m_BlockSize / 2 - 1,
+		m_Mouse.x + m_BlockSize / 2 + 1, m_Mouse.y + m_BlockSize / 2 + 1,
 		Black, true);
-	DrawBox(m_Mouse.x - BLOCK_SPAWN / 2, m_Mouse.y - BLOCK_SPAWN / 2,
-		m_Mouse.x + BLOCK_SPAWN / 2, m_Mouse.y + BLOCK_SPAWN / 2,
+	DrawBox(m_Mouse.x - m_BlockSize / 2, m_Mouse.y - m_BlockSize / 2,
+		m_Mouse.x + m_BlockSize / 2, m_Mouse.y + m_BlockSize / 2,
 		m_NowColor, true);
 
 	//　デバッグ文字情報
@@ -263,6 +276,9 @@ void PlayScene::DebugText()
 	DrawFormatString(0, 100, Black, "%d,%d", m_Move.x, m_Move.y);
 }
 
+//--------------------------------------------------------//
+//色の変更                                                //
+//--------------------------------------------------------//
 void PlayScene::ChangeBlockColor()
 {
 	//　ブロックの色変更
@@ -313,7 +329,7 @@ void PlayScene::BlockMove()
 
 	m_StartPos = {SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2};
 
-	if (pGameSystem->GetInputSystem().IsKeyDown(KEY_INPUT_SPACE))
+	if (GetMouseInput() & MOUSE_INPUT_MIDDLE)
 	{
 		if (m_StartPos.x > m_Mouse.x)
 		{
@@ -335,8 +351,8 @@ void PlayScene::BlockMove()
 		}
 	}
 
-	m_Move.x = Func::Clamp(m_Move.x, 0, STAGE_SIZE.x * BLOCK_SPAWN - SCREEN_WIDTH);
-	m_Move.y = Func::Clamp(m_Move.y, 0, STAGE_SIZE.y * BLOCK_SPAWN - SCREEN_WIDTH);
+	m_Move.x = Func::Clamp(m_Move.x, 0, STAGE_SIZE.x * m_BlockSize - SCREEN_WIDTH);
+	m_Move.y = Func::Clamp(m_Move.y, 0, STAGE_SIZE.y * m_BlockSize - SCREEN_WIDTH);
 }
 
 //--------------------------------------------------------//
