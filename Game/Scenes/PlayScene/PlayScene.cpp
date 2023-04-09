@@ -460,8 +460,4 @@ void PlayScene::LastExport()
 	{
 		ExportCSV();
 	}
-	else
-	{
-		ExitApp();
-	}
 }
