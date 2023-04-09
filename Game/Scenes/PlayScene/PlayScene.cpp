@@ -54,6 +54,9 @@ PlayScene::~PlayScene()
 {
 	InitGraph();
 
+	//　メモリ解放
+	m_MapBlock.clear();
+
 }
 
 //--------------------------------------------------------//
@@ -436,6 +439,7 @@ void PlayScene::ExportCSV()
 
 	//　ファイルを開く
 	ofstream ofs(path);
+
 
 	//　１行書きだしたら次の列へ
 	for (int y = 0; y < m_MapBlock.size(); y++)
