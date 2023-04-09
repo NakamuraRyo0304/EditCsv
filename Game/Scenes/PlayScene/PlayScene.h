@@ -19,7 +19,11 @@ private:
 	//　マウスの位置
 	Position m_Mouse;
 	Position m_Move;
-	Position m_StartPos;
+	
+	//　画面中心位置
+	Position m_CenterPos;
+
+	//　
 
 	//　CSVに書き出す数値
 	int m_BlockNum;
@@ -74,5 +78,5 @@ public:
 	void ExportCSV();
 
 	//　終了時に呼び出す
-	void LastExport();
+	void LastCheck();
 };

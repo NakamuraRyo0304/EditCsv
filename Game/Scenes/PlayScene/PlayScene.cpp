@@ -39,7 +39,7 @@ PlayScene::PlayScene() :
 	is_SaveFlag(),
 	m_NowColor(),
 	m_Move(),
-	m_StartPos(),
+	m_CenterPos(),
 	m_BlockSize()
 {
 	//　マウスカーソルを隠す
@@ -65,7 +65,7 @@ void PlayScene::Init(int screenWidth, int screenHeight)
 	is_SaveFlag = false;
 	m_Mouse = { 0 };
 	m_Move = { 0 };
-	m_StartPos = { 0 };
+	m_CenterPos = { 0 };
 	m_BlockNum = 0;
 	m_SaveCount = 0;
 	m_BlockSize = BLOCK_DEFAULT;
@@ -121,7 +121,7 @@ void PlayScene::Update(float deltaTime)
 	if (pGameSystem->GetInputSystem().IsKeyPressed(KEY_INPUT_RETURN))
 	{
 		//　セーブ確認
-		LastExport();
+		LastCheck();
 	}
 
 	//　ソフト終了
@@ -325,25 +325,25 @@ void PlayScene::BlockMove()
 {
 	GetMousePoint(&m_Mouse.x, &m_Mouse.y);
 
-	m_StartPos = {SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2};
+	m_CenterPos = {SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2};
 
 	if (GetMouseInput() & MOUSE_INPUT_MIDDLE)
 	{
-		if (m_StartPos.x > m_Mouse.x)
+		if (m_CenterPos.x > m_Mouse.x)
 		{
 			if (m_Move.x < 0)return;
 			m_Move.x -= 5;
 		}
-		if (m_StartPos.x < m_Mouse.x)
+		if (m_CenterPos.x < m_Mouse.x)
 		{
 			m_Move.x += 5;
 		}
-		if (m_StartPos.y > m_Mouse.y)
+		if (m_CenterPos.y > m_Mouse.y)
 		{
 			if (m_Move.y < 0)return;
 			m_Move.y -= 5;
 		}
-		if (m_StartPos.y < m_Mouse.y)
+		if (m_CenterPos.y < m_Mouse.y)
 		{
 			m_Move.y += 5;
 		}
@@ -457,7 +457,7 @@ void PlayScene::ExportCSV()
 //--------------------------------------------------------//
 //最後に書き出す                                          //
 //--------------------------------------------------------//
-void PlayScene::LastExport()
+void PlayScene::LastCheck()
 {
 	//　書き出すか
 	int isSave;
