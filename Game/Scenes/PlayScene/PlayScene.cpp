@@ -256,7 +256,7 @@ void PlayScene::DebugText()
 	//　セーブまでのカウント
 	if ((SAVE_SPAWN - m_SaveCount) / SECOND > 0)
 	{
-		DrawFormatString(20, 90, Black, "セーブまで:%d", (SAVE_SPAWN - m_SaveCount) / SECOND);
+		DrawFormatString(20, 90, Black, "AutoSave:%d", (SAVE_SPAWN - m_SaveCount) / SECOND);
 	}
 
 	//　セーブ確認
@@ -272,8 +272,6 @@ void PlayScene::DebugText()
 	{
 		DrawFormatString(20, 120, Black, "セーブ中.");
 	}
-
-	DrawFormatString(0, 100, Black, "%d,%d", m_Move.x, m_Move.y);
 }
 
 //--------------------------------------------------------//
