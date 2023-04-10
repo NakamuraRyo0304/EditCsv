@@ -252,8 +252,10 @@ void PlayScene::Finalize()
 //--------------------------------------------------------//
 void PlayScene::DebugText()
 {
+
 	//　スクリーン座標
-	DrawFormatString(20, 30, Black, "(x,y) = (%d,%d)", m_Mouse.x, m_Mouse.y);
+	DrawFormatString(20, 30, Black, "(x,y) = (%d,%d)",
+		(m_Mouse.x + m_Move.x) / m_BlockSize, (m_Mouse.y + m_Move.y) / m_BlockSize);
 	//　ブロック番号（マウスホイール回転量）
 	DrawFormatString(20, 60, Black, "Num = (%d)", m_BlockNum);
 	//　セーブまでのカウント
@@ -443,9 +445,9 @@ void PlayScene::ExportCSV()
 
 
 	//　１行書きだしたら次の列へ
-	for (int y = 0; y < m_MapBlock.size(); y++)
+	for (int y = 0; y < STAGE_SIZE.y; y++)
 	{
-		for (int x = 0; x < m_MapBlock[y].size(); x++)
+		for (int x = 0; x < STAGE_SIZE.x; x++)
 		{
 			ofs << m_MapBlock[y][x] << ",";
 		}
