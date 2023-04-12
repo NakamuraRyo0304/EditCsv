@@ -221,6 +221,12 @@ void PlayScene::Draw()
 				Gray, FALSE);
 		}
 	}
+	
+	//　選択中範囲
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 122);
+	DrawBox(m_Start.x, m_Start.y, m_End.x, m_End.y, m_NowColor, true);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
+
 
 	//　マウスの描画
 	if (m_BlockNum == 0)
@@ -275,8 +281,6 @@ void PlayScene::Finalize()
 //--------------------------------------------------------//
 void PlayScene::DebugText()
 {
-	DrawFormatString(0, 0, Black, "%d,%d", m_Start.x, m_Start.y);
-	DrawFormatString(0, 30, Black, "%d,%d", m_End.x, m_End.y);
 }
 //--------------------------------------------------------//
 //色の変更                                                //
@@ -496,20 +500,21 @@ void PlayScene::DrawUserInterface()
 	SetFontSize(30);
 	
 	//　スクリーン座標
-	DrawFormatString(650, 30, Black, "(x,y)=(%d,%d)",
+	DrawFormatString(700, 80, Black, "(x,y)=(%d,%d)",
 		(m_Mouse.x + m_Move.x - BLOCK_DEFAULT / 2) / m_BlockSize, 
 		(m_Mouse.y + m_Move.y - BLOCK_DEFAULT / 2) / m_BlockSize);
 
 	//　開始地点
-	DrawFormatString(650, 60, Black, "S:%d,%d",
+	DrawFormatString(700, 120, Black, "CKey:%d,%d",
 		(m_Start.x + m_Move.x - BLOCK_DEFAULT / 2) / m_BlockSize, 
 		(m_Start.y + m_Move.y - BLOCK_DEFAULT / 2) / m_BlockSize);
 
 	//　終了地点
-	DrawFormatString(650, 90, Black, "E:%d,%d",
+	DrawFormatString(700, 160, Black, "XKey:%d,%d",
 		(m_End.x + m_Move.x - BLOCK_DEFAULT / 2) / m_BlockSize,
 		(m_End.y + m_Move.y - BLOCK_DEFAULT / 2) / m_BlockSize);
 
+	DrawFormatString(700, 200, Black, "ZKey:Back\nEnter:Save\nEsc:End");
 	SetFontSize(font);
 }
 
@@ -518,16 +523,28 @@ void PlayScene::DrawUserInterface()
 //--------------------------------------------------------//
 void PlayScene::SquareBox()
 {
-	if (pGameSystem->GetInputSystem().IsKeyPressed(KEY_INPUT_S))
+	//　開始と終了地点を決める
+	if (pGameSystem->GetInputSystem().IsKeyDown(KEY_INPUT_C))
 	{
 		GetMousePoint(&m_Mouse.x, &m_Mouse.y);
 		m_Start = m_Mouse;
 	}
-	if (pGameSystem->GetInputSystem().IsKeyPressed(KEY_INPUT_E))
+	if (pGameSystem->GetInputSystem().IsKeyDown(KEY_INPUT_X))
 	{
 		GetMousePoint(&m_Mouse.x, &m_Mouse.y);
 		m_End = m_Mouse;
 	}
+
+	//　配列範囲外にアクセスしない
+	if ((m_Start.y + m_Move.y) / m_BlockSize < 0 ||						//Yが0未満
+		(m_Start.x + m_Move.x) / m_BlockSize < 0 ||						//Xが0未満
+		(m_Start.y + m_Move.y) / m_BlockSize > STAGE_SIZE.y ||			//Yが最大値超過
+		(m_Start.x + m_Move.x) / m_BlockSize > STAGE_SIZE.x) return;	//Xが最大値超過
+	if ((m_End.y + m_Move.y) / m_BlockSize < 0 ||						//Yが0未満
+		(m_End.x + m_Move.x) / m_BlockSize < 0 ||						//Xが0未満
+		(m_End.y + m_Move.y) / m_BlockSize > STAGE_SIZE.y ||			//Yが最大値超過
+		(m_End.x + m_Move.x) / m_BlockSize > STAGE_SIZE.x) return;	//Xが最大値超過
+
 
 	//　配列の格納
 	if (GetMouseInput() & MOUSE_INPUT_RIGHT)
