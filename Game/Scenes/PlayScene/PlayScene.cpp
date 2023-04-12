@@ -97,7 +97,8 @@ void PlayScene::Update(float deltaTime)
 	if (GetMouseInput() & MOUSE_INPUT_LEFT)
 	{
 		//　配列範囲外にアクセスしない
-		if (m_Mouse.x < 0 || m_Mouse.y < 0) return;
+		if (m_Mouse.x < 0 || m_Mouse.y < 0 || 
+			m_Mouse.x > SCREEN_WIDTH ||m_Mouse.y > SCREEN_HEIGHT) return;
 
 		m_MapBlock[(m_Mouse.y + m_Move.y) / m_BlockSize][(m_Mouse.x + m_Move.x) / m_BlockSize] = m_BlockNum;
 	}
