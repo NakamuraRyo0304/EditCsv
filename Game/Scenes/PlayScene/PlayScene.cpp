@@ -28,6 +28,9 @@
 typedef struct { int x, y; }STAGESIZE;
 STAGESIZE STAGE_SIZE = { 500,400 };
 
+//　マウス移動速度
+#define		MOUSE_MOVE_SPEED	8
+
  //--------------------------------------------------------//
  //コンストラクタ                                          //
  //--------------------------------------------------------//
@@ -40,7 +43,8 @@ PlayScene::PlayScene() :
 	m_NowColor(),
 	m_Move(),
 	m_CenterPos(),
-	m_BlockSize()
+	m_BlockSize(),
+	is_UiFlag()
 {
 	//　マウスカーソルを隠す
 	SetMouseDispFlag(false);
@@ -68,6 +72,7 @@ void PlayScene::Init(int screenWidth, int screenHeight)
 	is_SaveFlag = false;
 	m_Mouse = { 0 };
 	m_Move = { 0 };
+
 	m_CenterPos = { 0 };
 	m_BlockNum = 0;
 	m_SaveCount = 0;
@@ -87,18 +92,23 @@ void PlayScene::Update(float deltaTime)
 	//　オートセーブ
 	AutoSave();
 
+	//　四角形のマス塗り
+	SquareBox();
+
 	//　色の変更
 	ChangeBlockColor();
 
 	//　マウスの座標取得
 	GetMousePoint(&m_Mouse.x, &m_Mouse.y);
 	
-	//　右クリック描画
+	//　左クリック描画
 	if (GetMouseInput() & MOUSE_INPUT_LEFT)
 	{
 		//　配列範囲外にアクセスしない
-		if (m_Mouse.x < 0 || m_Mouse.y < 0 || 
-			m_Mouse.x > SCREEN_WIDTH ||m_Mouse.y > SCREEN_HEIGHT) return;
+		if ((m_Mouse.y + m_Move.y) / m_BlockSize < 0 ||						//Yが0未満
+			(m_Mouse.x + m_Move.x) / m_BlockSize < 0 ||						//Xが0未満
+			(m_Mouse.y + m_Move.y) / m_BlockSize > STAGE_SIZE.y ||			//Yが最大値超過
+			(m_Mouse.x + m_Move.x) / m_BlockSize > STAGE_SIZE.x) return;	//Xが最大値超過
 
 		m_MapBlock[(m_Mouse.y + m_Move.y) / m_BlockSize][(m_Mouse.x + m_Move.x) / m_BlockSize] = m_BlockNum;
 	}
@@ -212,13 +222,25 @@ void PlayScene::Draw()
 		}
 	}
 
-	//　マウスの位置
-	DrawBox(m_Mouse.x - m_BlockSize / 2 - 1, m_Mouse.y - m_BlockSize / 2 - 1,
-		m_Mouse.x + m_BlockSize / 2 + 1, m_Mouse.y + m_BlockSize / 2 + 1,
-		Black, true);
-	DrawBox(m_Mouse.x - m_BlockSize / 2, m_Mouse.y - m_BlockSize / 2,
-		m_Mouse.x + m_BlockSize / 2, m_Mouse.y + m_BlockSize / 2,
-		m_NowColor, true);
+	//　マウスの描画
+	if (m_BlockNum == 0)
+	{
+		DrawBox(m_Mouse.x - m_BlockSize / 2 - 1, m_Mouse.y - m_BlockSize / 2 - 1,
+			m_Mouse.x + m_BlockSize / 2 + 1, m_Mouse.y + m_BlockSize / 2 + 1,
+			Black, true);
+		DrawBox(m_Mouse.x - m_BlockSize / 2, m_Mouse.y - m_BlockSize / 2,
+			m_Mouse.x + m_BlockSize / 2, m_Mouse.y + m_BlockSize / 2,
+			White, true);
+	}
+	else
+	{
+		DrawBox(m_Mouse.x - m_BlockSize / 2, m_Mouse.y - m_BlockSize / 2,
+			m_Mouse.x + m_BlockSize / 2, m_Mouse.y + m_BlockSize / 2,
+			m_NowColor, true);
+	}
+
+	//　座標と色
+	DrawUserInterface();
 
 	//　デバッグ文字情報
 	DebugText();
@@ -253,33 +275,9 @@ void PlayScene::Finalize()
 //--------------------------------------------------------//
 void PlayScene::DebugText()
 {
-
-	//　スクリーン座標
-	DrawFormatString(20, 30, Black, "(x,y) = (%d,%d)",
-		(m_Mouse.x + m_Move.x) / m_BlockSize, (m_Mouse.y + m_Move.y) / m_BlockSize);
-	//　ブロック番号（マウスホイール回転量）
-	DrawFormatString(20, 60, Black, "Num = (%d)", m_BlockNum);
-	//　セーブまでのカウント
-	if ((SAVE_SPAWN - m_SaveCount) / SECOND > 0)
-	{
-		DrawFormatString(20, 90, Black, "AutoSave:%d", (SAVE_SPAWN - m_SaveCount) / SECOND);
-	}
-
-	//　セーブ確認
-	if		(m_SaveCount > SAVE_SPAWN + (2 * FRAME))
-	{
-		DrawFormatString(20, 120, Black, "セーブ中...");
-	}
-	else if (m_SaveCount > SAVE_SPAWN + (1 * FRAME))
-	{
-		DrawFormatString(20, 120, Black, "セーブ中..");
-	}
-	else if (m_SaveCount > SAVE_SPAWN + (0 * FRAME))
-	{
-		DrawFormatString(20, 120, Black, "セーブ中.");
-	}
+	DrawFormatString(0, 0, Black, "%d,%d", m_Start.x, m_Start.y);
+	DrawFormatString(0, 30, Black, "%d,%d", m_End.x, m_End.y);
 }
-
 //--------------------------------------------------------//
 //色の変更                                                //
 //--------------------------------------------------------//
@@ -338,25 +336,25 @@ void PlayScene::BlockMove()
 		if (m_CenterPos.x > m_Mouse.x)
 		{
 			if (m_Move.x < 0)return;
-			m_Move.x -= 5;
+			m_Move.x -= MOUSE_MOVE_SPEED;
 		}
 		if (m_CenterPos.x < m_Mouse.x)
 		{
-			m_Move.x += 5;
+			m_Move.x += MOUSE_MOVE_SPEED;
 		}
 		if (m_CenterPos.y > m_Mouse.y)
 		{
 			if (m_Move.y < 0)return;
-			m_Move.y -= 5;
+			m_Move.y -= MOUSE_MOVE_SPEED;
 		}
 		if (m_CenterPos.y < m_Mouse.y)
 		{
-			m_Move.y += 5;
+			m_Move.y += MOUSE_MOVE_SPEED;
 		}
 	}
 
 	m_Move.x = Func::Clamp(m_Move.x, 0, STAGE_SIZE.x * m_BlockSize - SCREEN_WIDTH);
-	m_Move.y = Func::Clamp(m_Move.y, 0, STAGE_SIZE.y * m_BlockSize - SCREEN_WIDTH);
+	m_Move.y = Func::Clamp(m_Move.y, 0, STAGE_SIZE.y * m_BlockSize - SCREEN_HEIGHT);
 }
 
 //--------------------------------------------------------//
@@ -481,5 +479,79 @@ void PlayScene::LastCheck()
 	if (isSave == IDYES)
 	{
 		ExportCSV();
+	}
+}
+
+//--------------------------------------------------------//
+//UIの表示                                                //
+//--------------------------------------------------------//
+void PlayScene::DrawUserInterface()
+{
+	//　色の設定
+	DrawBox(900, 10,950, 60, Black, true);
+	DrawBox(901, 11,949, 59, m_NowColor, true);
+
+	//　フォントの設定
+	int font = GetFontSize();
+	SetFontSize(30);
+	
+	//　スクリーン座標
+	DrawFormatString(650, 30, Black, "(x,y)=(%d,%d)",
+		(m_Mouse.x + m_Move.x - BLOCK_DEFAULT / 2) / m_BlockSize, 
+		(m_Mouse.y + m_Move.y - BLOCK_DEFAULT / 2) / m_BlockSize);
+
+	//　開始地点
+	DrawFormatString(650, 60, Black, "S:%d,%d",
+		(m_Start.x + m_Move.x - BLOCK_DEFAULT / 2) / m_BlockSize, 
+		(m_Start.y + m_Move.y - BLOCK_DEFAULT / 2) / m_BlockSize);
+
+	//　終了地点
+	DrawFormatString(650, 90, Black, "E:%d,%d",
+		(m_End.x + m_Move.x - BLOCK_DEFAULT / 2) / m_BlockSize,
+		(m_End.y + m_Move.y - BLOCK_DEFAULT / 2) / m_BlockSize);
+
+	SetFontSize(font);
+}
+
+//--------------------------------------------------------//
+//四角形の描画                                            //
+//--------------------------------------------------------//
+void PlayScene::SquareBox()
+{
+	if (pGameSystem->GetInputSystem().IsKeyPressed(KEY_INPUT_S))
+	{
+		GetMousePoint(&m_Mouse.x, &m_Mouse.y);
+		m_Start = m_Mouse;
+	}
+	if (pGameSystem->GetInputSystem().IsKeyPressed(KEY_INPUT_E))
+	{
+		GetMousePoint(&m_Mouse.x, &m_Mouse.y);
+		m_End = m_Mouse;
+	}
+
+	//　配列の格納
+	if (GetMouseInput() & MOUSE_INPUT_RIGHT)
+	{
+		//　大小が入れ替わってたら変更
+		if (m_Start.x > m_End.x)
+		{
+			int tmp = m_Start.x;
+			m_Start.x = m_End.x;
+			m_End.x = tmp;
+		}
+		if (m_Start.y > m_End.y)
+		{
+			int tmp = m_Start.y;
+			m_Start.y = m_End.y;
+			m_End.y = tmp;
+		}
+		//　格納
+		for (int y = (m_Start.y + m_Move.y); y < (m_End.y + m_Move.y); y++)
+		{
+			for (int x = (m_Start.x + m_Move.x); x < (m_End.x + m_Move.x); x++)
+			{
+				m_MapBlock[y / m_BlockSize][x / m_BlockSize] = m_BlockNum;
+			}
+		}
 	}
 }
