@@ -500,21 +500,21 @@ void PlayScene::DrawUserInterface()
 	SetFontSize(30);
 	
 	//　スクリーン座標
-	DrawFormatString(700, 80, Black, "(x,y)=(%d,%d)",
+	DrawFormatString(700, 80, Black, "(x:y):(%d,%d)",
 		(m_Mouse.x + m_Move.x - BLOCK_DEFAULT / 2) / m_BlockSize, 
 		(m_Mouse.y + m_Move.y - BLOCK_DEFAULT / 2) / m_BlockSize);
 
 	//　開始地点
-	DrawFormatString(700, 120, Black, "CKey:%d,%d",
+	DrawFormatString(700, 120, Black, "CKey :(%d:%d)",
 		(m_Start.x + m_Move.x - BLOCK_DEFAULT / 2) / m_BlockSize, 
 		(m_Start.y + m_Move.y - BLOCK_DEFAULT / 2) / m_BlockSize);
 
 	//　終了地点
-	DrawFormatString(700, 160, Black, "XKey:%d,%d",
+	DrawFormatString(700, 160, Black, "XKey :(%d:%d)",
 		(m_End.x + m_Move.x - BLOCK_DEFAULT / 2) / m_BlockSize,
 		(m_End.y + m_Move.y - BLOCK_DEFAULT / 2) / m_BlockSize);
 
-	DrawFormatString(700, 200, Black, "ZKey:Back\nEnter:Save\nEsc:End");
+	DrawFormatString(700, 200, Black, "Paint:Click\nWheel:ChangeColor\nZKey :Back\nEnter:Save\nEsc  :End");
 	SetFontSize(font);
 }
 
